@@ -4,6 +4,7 @@ import {NgForm} from "@angular/forms";
 import {Location} from "../../models/location.interface";
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera, CameraOptions } from '@ionic-native/camera';
+import {PlacesService} from "../../providers/places/places";
 
 /**
  * Generated class for the AddPlacePage page.
@@ -26,15 +27,16 @@ export class AddPlacePage {
 
   options: CameraOptions = {
     quality: 100,
-    destinationType: this.camera.DestinationType.DATA_URL,
     encodingType: this.camera.EncodingType.JPEG,
     correctOrientation: true,
     mediaType: this.camera.MediaType.PICTURE
   }
 
   locationIsSet = false;
+  imageUrl: string;
 
   constructor(
+    private placesSrv: PlacesService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
     private geoLocation: Geolocation,
@@ -83,7 +85,8 @@ export class AddPlacePage {
     this.camera.getPicture(this.options).then((imageData) => {
      // imageData is either a base64 encoded string or a file URI
      // If it's base64:
-     let base64Image = 'data:image/jpeg;base64,' + imageData;
+     // let base64Image = 'data:image/jpeg;base64,' + imageData;
+     this.imageUrl = imageData;
      console.log(imageData);
     }, (err) => {
      console.error(err);
@@ -91,7 +94,14 @@ export class AddPlacePage {
   }
 
   onSubmit(form: NgForm) {
-      console.log(form.value);
+      this.placesSrv.addPlace(form.value.title, form.value.description, this.location, this.imageUrl);
+      form.reset();
+      this.location = {
+        lat: -1.28333,
+        lng: 36.81667
+      };
+      this.imageUrl = '';
+      this.locationIsSet = false;
   }
 
 }

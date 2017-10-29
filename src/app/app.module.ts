@@ -8,6 +8,7 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
 
 import { MyApp } from './app.component';
+import { PlacesService } from '../providers/places/places';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { MyApp } from './app.component';
     SplashScreen,
     Geolocation,
     Camera,
-    {provide: ErrorHandler, useClass: IonicErrorHandler}
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    PlacesService
   ]
 })
 export class AppModule {}
