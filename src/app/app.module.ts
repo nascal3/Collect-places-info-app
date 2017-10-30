@@ -6,9 +6,12 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera } from '@ionic-native/camera';
+import { File } from '@ionic-native/file';
+import { IonicStorageModule } from '@ionic/storage';
+
 
 import { MyApp } from './app.component';
-import { PlacesService } from '../providers/places/places';
+import { PlacesService } from '../providers/places/places.service';
 
 @NgModule({
   declarations: [
@@ -17,7 +20,8 @@ import { PlacesService } from '../providers/places/places';
   imports: [
     BrowserModule,
     FormsModule,
-    IonicModule.forRoot(MyApp)
+    IonicModule.forRoot(MyApp),
+    IonicStorageModule.forRoot()
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -28,6 +32,7 @@ import { PlacesService } from '../providers/places/places';
     SplashScreen,
     Geolocation,
     Camera,
+    File,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     PlacesService
   ]

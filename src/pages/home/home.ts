@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, OnInit } from '@angular/core';
+import {IonicPage, ModalController, NavController, NavParams} from 'ionic-angular';
 import {Place} from "../../models/place.interface";
-import {PlacesService} from "../../providers/places/places";
+import {PlacesService} from "../../providers/places/places.service";
 
 /**
  * Generated class for the HomePage page.
@@ -15,13 +15,18 @@ import {PlacesService} from "../../providers/places/places";
   selector: 'page-home',
   templateUrl: 'home.html',
 })
-export class HomePage {
+export class HomePage implements OnInit{
 
   places: Place[] = [];
 
   constructor(
+    private modalCtrl: ModalController,
     private placesSrv: PlacesService,
     public navCtrl: NavController, public navParams: NavParams) {
+  }
+
+  ngOnInit() {
+    this.placesSrv.fetchPlaces();
   }
 
   ionViewWillEnter() {
@@ -30,6 +35,11 @@ export class HomePage {
 
   navPush() {
     this.navCtrl.push("AddPlacePage");
+  }
+
+  onOpenPlace(place: Place, index: number) {
+    const modal = this.modalCtrl.create('PlacePage', {place: place, index: index});
+    modal.present();
   }
 
 }

@@ -4,14 +4,11 @@ import {NgForm} from "@angular/forms";
 import {Location} from "../../models/location.interface";
 import { Geolocation } from '@ionic-native/geolocation';
 import { Camera, CameraOptions } from '@ionic-native/camera';
-import {PlacesService} from "../../providers/places/places";
+import {PlacesService} from "../../providers/places/places.service";
+import {Entry, File, FileError} from '@ionic-native/file';
+import {cordovaWarn} from "@ionic-native/core";
 
-/**
- * Generated class for the AddPlacePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+declare var cordova: any;
 
 @IonicPage()
 @Component({
@@ -36,6 +33,7 @@ export class AddPlacePage {
   imageUrl: string;
 
   constructor(
+    private file: File,
     private placesSrv: PlacesService,
     private loadingCtrl: LoadingController,
     private toastCtrl: ToastController,
@@ -83,13 +81,36 @@ export class AddPlacePage {
 
   onTakePhoto() {
     this.camera.getPicture(this.options).then((imageData) => {
-     // imageData is either a base64 encoded string or a file URI
-     // If it's base64:
-     // let base64Image = 'data:image/jpeg;base64,' + imageData;
-     this.imageUrl = imageData;
-     console.log(imageData);
+      const currentName = imageData.replace(/^.*[\\\/]/, '');
+      const path = imageData.replace(/[^\/]*$/, '');
+      this.file.moveFile(path, currentName, cordova.file.dataDirectory, currentName)
+        .then(
+          (data: Entry)  => {
+            this.imageUrl = data.nativeURL;
+            this.camera.cleanup();
+            // this.file.removeFile(path, currentName);
+          }
+        )
+        .catch(
+          (err: FileError) => {
+            this.imageUrl = '';
+            const toast = this.toastCtrl.create({
+              message: 'Could not save image, Try again!',
+              duration: 4000
+            });
+            toast.present();
+            this.camera.cleanup();
+          }
+        )
+      this.imageUrl = imageData;
     }, (err) => {
-     console.error(err);
+      const toast = this.toastCtrl.create({
+              message: 'Could not take image, Try again!',
+              duration: 4000
+            });
+      toast.present();
+      this.camera.cleanup()
+      console.error(err);
     });
   }
 
