@@ -2,19 +2,18 @@ import { Injectable } from '@angular/core';
 import { Place } from "../../models/place.interface";
 import {Location} from "../../models/location.interface";
 import { Storage } from '@ionic/storage';
+import {Entry, File, FileError} from '@ionic-native/file';
 
-/*
-  Generated class for the PlacesProvider provider.
+declare var cordova: any;
 
-  See https://angular.io/guide/dependency-injection for more info on providers
-  and Angular DI.
-*/
+
 @Injectable()
 export class PlacesService {
 
   private places: Place[] = [];
 
   constructor(
+    private file: File,
     private storage: Storage
   ) {
 
@@ -47,7 +46,31 @@ export class PlacesService {
   }
 
   deletePlace(index: number) {
+    const place = this.places[index];
     this.places.splice(index, 1);
+    this.storage.set('places', this.places)
+      .then(
+        () => {
+          this.removeFile(place)
+        }
+      )
+      .catch(err => {
+        console.log(err);
+      })
+  }
+
+  private removeFile(place: Place) {
+    const currentName = place.imageUrl.replace(/^.*[\\\/]/, '');
+    this.file.removeFile(cordova.file.dataDirectory, currentName)
+      .then(
+        () => console.log('Removed File')
+      )
+      .catch(
+        (err => {
+          console.log(err);
+          this.addPlace(place.title, place.description, place.location, place.imageUrl)
+        })
+      );
   }
 
 }

@@ -6,7 +6,6 @@ import { Geolocation } from '@ionic-native/geolocation';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 import {PlacesService} from "../../providers/places/places.service";
 import {Entry, File, FileError} from '@ionic-native/file';
-import {cordovaWarn} from "@ionic-native/core";
 
 declare var cordova: any;
 
